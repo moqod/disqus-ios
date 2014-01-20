@@ -1,6 +1,16 @@
-# Xcode
+*xcodeproj/*mode*
+*xcodeproj/*pbxuser
+*xcodeproj/*per*
+*xcodeproj/project.xcworkspace
+*xcodeproj/xcuserdata
+*tmproj
+project.xcworkspace
+.svn
+
+build/*
 .DS_Store
-*/build/*
+xcuserdata/
+
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -9,13 +19,10 @@
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
+*.xcworkspace
+!default.xcworkspace
 xcuserdata
 profile
 *.moved-aside
-DerivedData
-.idea/
-*.hmap
-*.xccheckout
-
-#CocoaPods
-Pods
+*~.nib
+Thumbs.db
