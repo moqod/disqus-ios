@@ -17,9 +17,15 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
 	
-	_disqusComponent = [[MDDisqusComponent alloc] initWithPublicKey:@"WIGd3KxBOh9dL4xElmMT187srgiJisi3qE32vH8HMe9REOh1q5frteV8eRbN6UdM" secretKey:@"APreuwmWueMXGVjA6807MjJsZFYb6zZ6inevwy5tJwq5DFUp3lDkb2hLw6b9BhaS" redirectURL:[NSURL URLWithString:@"http://moqod.com"]];
+	NSString *publicKey = @"WIGd3KxBOh9dL4xElmMT187srgiJisi3qE32vH8HMe9REOh1q5frteV8eRbN6UdM";
+	NSString *secretKey = @"APreuwmWueMXGVjA6807MjJsZFYb6zZ6inevwy5tJwq5DFUp3lDkb2hLw6b9BhaS";
+	NSString *redirectURLString = @"http://moqod.com";
 	
-	UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:[[[MDThreadsViewController alloc] init] autorelease]] autorelease];
+	_disqusComponent = [[MDDisqusComponent alloc] initWithPublicKey:publicKey secretKey:secretKey redirectURL:[NSURL URLWithString:redirectURLString]];
+	
+	NSString *forumShortname = @"moqodtest";
+	MDThreadsViewController *threadsViewController = [[[MDThreadsViewController alloc] initWithForumShortname:forumShortname] autorelease];
+	UINavigationController *navigationController = [[[UINavigationController alloc] initWithRootViewController:threadsViewController] autorelease];
 	self.window.rootViewController = navigationController;
     [self.window makeKeyAndVisible];
 	

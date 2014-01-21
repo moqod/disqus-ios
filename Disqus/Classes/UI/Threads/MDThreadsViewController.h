@@ -10,4 +10,6 @@
 
 @interface MDThreadsViewController : MDBaseViewController
 
+- (id)initWithForumShortname:(NSString *)forumShortname;
+
 @end

@@ -11,7 +11,7 @@
 // tags
 const int MDNewPostViewControllerSuccessAlertViewTag			= 1;
 
-@interface MDNewPostViewController () <UIAlertViewDelegate> {
+@interface MDNewPostViewController () <UIAlertViewDelegate, UITextFieldDelegate> {
 	UITextField			*_textField;
 }
 @property (nonatomic, retain) NSString			*threadId;
@@ -64,6 +64,13 @@ const int MDNewPostViewControllerSuccessAlertViewTag			= 1;
 	if (MDNewPostViewControllerSuccessAlertViewTag == alertView.tag) {
 		[self.navigationController popViewControllerAnimated:YES];
 	}
+}
+
+#pragma mark - UITextFieldDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+	[self addNewPostAction];
+	return NO;
 }
 
 #pragma mark -

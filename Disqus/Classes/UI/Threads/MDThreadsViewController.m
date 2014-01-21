@@ -11,6 +11,7 @@
 
 @interface MDThreadsViewController ()
 
+@property (nonatomic, copy) NSString			*forumShortname;
 @property (nonatomic, retain) NSArray			*threadsList;
 
 @end
@@ -19,10 +20,21 @@
 
 #pragma mark -
 
+- (id)initWithForumShortname:(NSString *)forumShortname {
+	if (self = [super init]) {
+		self.forumShortname = forumShortname;
+	}
+	return self;
+}
+
+#pragma mark -
+
 - (void)requestThreadsList {
 	[self showActivityIndicatorView];
 	
-	[GetAppDelegate().disqusComponent requestAPI:@"threads/list" params:@{@"forum" : @"jnis"} handler:^(NSDictionary *response, NSError *error) {
+	assert( self.forumShortname != nil );
+	
+	[GetAppDelegate().disqusComponent requestAPI:@"threads/list" params:@{@"forum" : self.forumShortname} handler:^(NSDictionary *response, NSError *error) {
 		[self hideActivityIndicatorView];		
 		if (nil == error) {
 			self.threadsList = [response objectForKey:@"response"];
@@ -39,8 +51,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-	
-	self.title = @"jnis";
+	self.title = self.forumShortname;
 	self.clearsSelectionOnViewWillAppear = YES;
 	self.tableView.tableFooterView = [[[UIView alloc] initWithFrame:CGRectZero] autorelease];
 	[self requestThreadsList];
@@ -48,6 +59,7 @@
 
 - (void)dealloc {
 	[_threadsList release];
+	[_forumShortname release];
 	[super dealloc];
 }
 
