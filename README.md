@@ -6,15 +6,17 @@ The project has been created by Moqod team to help many developers searching for
 
 Feel free to get in touch with us in regards to any questions or cooperation requests via email [info@moqod.com](mailto:info@moqod.com).
 
+# Attention
+- Please, note the library uses git submodules, so make sure you clone the submodules to be able to use the library.
+- The project is non-ARC at the moment. To use it in your ARC-based projects add `-fno-objc-arc` flag to source files.
+
+
 # Features
 - Authorization via disqus.com.
 - API access.
 - Posting comments to discuss.
 - Answering comments in a thread.
 - And much more! Just learn the API and documentation.
-
-# Attention
-The project is non-ARC at the moment. To use it in your ARC-based projects add `-fno-objc-arc` flag to source files.
 
 # Todo
 - Access token refresh.
