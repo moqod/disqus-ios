@@ -6,6 +6,12 @@ The project has been created by Moqod team to help many developers searching for
 
 Feel free to get in touch with us in regards to any questions or cooperation requests via email [info@moqod.com](mailto:info@moqod.com).
 
+# Update
+- Added ARC support to `MDDisqusComponent`.
+
+# Attention
+- Please, note the library uses git submodules, so make sure you clone the submodules to be able to use the library.
+
 # Features
 - Authorization via disqus.com.
 - API access.
@@ -13,13 +19,9 @@ Feel free to get in touch with us in regards to any questions or cooperation req
 - Answering comments in a thread.
 - And much more! Just learn the API and documentation.
 
-# Attention
-The project is non-ARC at the moment. To use it in your ARC-based projects add `-fno-objc-arc` flag to source files.
-
 # Todo
 - Access token refresh.
 - Customizable authorization user interface. 
-- ARC support.
 - Authorization via supported social networks (Facebook, Twitter, Google+)
 
 # 3rd Libraries

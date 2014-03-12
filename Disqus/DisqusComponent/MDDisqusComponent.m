@@ -42,10 +42,12 @@ NS_INLINE NSString *MDDisqusTokensModelRefreshTokenKeyForPublicKey(NSString *pub
 }
 
 - (void)dealloc {
-	[_accessToken release];
+#if !__has_feature(objc_arc)
+    [_accessToken release];
 	[_refreshToken release];
 	[_publicKey release];
 	[super dealloc];
+#endif
 }
 
 - (void)dump {
@@ -128,24 +130,32 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
 
 - (id)initWithPublicKey:(NSString *)publicKey secretKey:(NSString *)secretKey redirectURL:(NSURL *)redirectURL {
 	if (!publicKey || !secretKey) {
+#if !__has_feature(objc_arc)
 		[self autorelease];
+#endif
 		return nil;
 	} else if (self = [super init]) {
 		self.publicKey = publicKey;
 		self.secretKey = secretKey;
 		self.redirectURL = redirectURL;
 		
-		self.tokensModel = [[[MDDisqusTokensModel alloc] initWithPublicKey:publicKey] autorelease];
+        MDDisqusTokensModel *model = [[MDDisqusTokensModel alloc] initWithPublicKey:publicKey];
+#if !__has_feature(objc_arc)
+        [model autorelease];
+#endif
+		self.tokensModel = model;
 	}
 	return self;
 }
 
 - (void)dealloc {
+#if !__has_feature(objc_arc)
 	[_publicKey release];
 	[_secretKey release];
 	[_redirectURL release];
 	[_authorizationCompletionHandler release];
 	[super dealloc];
+#endif
 }
 
 #pragma mark -
@@ -157,21 +167,39 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
     NSString *params = [NSString stringWithFormat:@"client_id=%@&scope=read,write&response_type=code&redirect_uri=%@", self.publicKey, self.redirectURL.absoluteString];
 	NSURL *authorizeURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@?%@", MDDisqusComponentAuthorizeURL, params]];
 
-	UIViewController *viewController = [[[UIViewController alloc] init] autorelease];
+	UIViewController *viewController = [[UIViewController alloc] init];
+#if !__has_feature(objc_arc)
+    [viewController autorelease];
+#endif
 	viewController.title = @"Disqus";
-	UIWebView *webView = [[[UIWebView alloc] initWithFrame:CGRectZero] autorelease];
+	UIWebView *webView = [[UIWebView alloc] initWithFrame:CGRectZero];
+#if !__has_feature(objc_arc)
+    [webView autorelease];
+#endif
 	webView.delegate = self;
 	viewController.view = webView;
 	
-	UINavigationController *fakeNavigationController = [[[UINavigationController alloc] initWithRootViewController:viewController] autorelease];
+	UINavigationController *fakeNavigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
+#if !__has_feature(objc_arc)
+    [fakeNavigationController autorelease];
+#endif
 	[webView loadRequest:[NSURLRequest requestWithURL:authorizeURL]];
-	viewController.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAuthorizationAction)] autorelease];
+    
+    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAuthorizationAction)];
+#if !__has_feature(objc_arc)
+    [barButtonItem autorelease];
+#endif
+	viewController.navigationItem.rightBarButtonItem = barButtonItem;
 	[parentViewController presentViewController:fakeNavigationController animated:YES completion:nil];
 }
 
 - (void)logout {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    for (NSHTTPCookie *cookie in [[[cookieStorage cookiesForURL:[NSURL URLWithString:MDDisqusComponentBaseAuthURL]] copy] autorelease]) {
+    NSArray *cookies = [[cookieStorage cookiesForURL:[NSURL URLWithString:MDDisqusComponentBaseAuthURL]] copy];
+#if !__has_feature(objc_arc)
+    [cookies  autorelease];
+#endif
+    for (NSHTTPCookie *cookie in cookies) {
         [cookieStorage deleteCookie:cookie];
     }
 	[self.tokensModel reset];
@@ -220,7 +248,10 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
 	NSString *paramsString = [NSString stringWithFormat:@"client_id=%@&client_secret=%@&grant_type=%@&redirect_uri=%@&code=%@", self.publicKey, self.secretKey, @"authorization_code", self.redirectURL, requestToken];
 	request.HTTPBody = [paramsString dataUsingEncoding:NSUTF8StringEncoding];
 	request.HTTPMethod = @"POST";
-	AFHTTPRequestOperation *operation = [[[AFHTTPRequestOperation alloc] initWithRequest:request] autorelease];
+	AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+#if !__has_feature(objc_arc)
+    [operation autorelease];
+#endif
 	operation.responseSerializer = [AFJSONResponseSerializer serializer];
 	[operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, NSDictionary *response) {
 		if ([response isKindOfClass:[NSDictionary class]] && [response objectForKey:@"access_token"] && [response objectForKey:@"refresh_token"]) {
@@ -277,8 +308,15 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
 	}
 	
 	NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-	[userInfo setValue:[handler copy] forKey:@"handler"];
-	AFHTTPRequestOperation *operation = [[[AFHTTPRequestOperation alloc] initWithRequest:request] autorelease];
+    dispatch_block_t block = [handler copy];
+#if !__has_feature(objc_arc)
+	[block autorelease];
+#endif
+    [userInfo setValue:block forKey:@"handler"];
+	AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+#if !__has_feature(objc_arc)
+    [operation autorelease];
+#endif
 	operation.userInfo = userInfo;
 	operation.responseSerializer = [AFJSONResponseSerializer serializer];
 	[operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id response) {
@@ -286,7 +324,6 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
 		if (responseHandler) {
 			responseHandler(response, nil);
 		}
-		[responseHandler release];
 	} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 		// may be it is disqus error
 		NSError *parsingError = nil;
@@ -316,7 +353,6 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
 		if (responseHandler) {
 			responseHandler(nil, error);
 		}
-		[responseHandler release];
 	}];
 	[operation start];
 }
