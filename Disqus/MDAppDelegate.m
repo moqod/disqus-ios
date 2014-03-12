@@ -14,7 +14,7 @@
 @implementation MDAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+	self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     self.window.backgroundColor = [UIColor whiteColor];
 	
 	NSString *publicKey = @"WIGd3KxBOh9dL4xElmMT187srgiJisi3qE32vH8HMe9REOh1q5frteV8eRbN6UdM";
