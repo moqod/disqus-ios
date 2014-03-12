@@ -7,17 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MDDisqusConstants.h"
 
 typedef void(^MDDisqusComponentAPIHandler)(id response, NSError *error);
 typedef void(^MDDisqusComponentAuthorizationHandler)(NSError *error);
-
-extern NSString *const MDDisqusComponentErrorDomain;
-
-typedef NS_ENUM(NSUInteger, MDDisqusComponentError) {
-	MDDisqusComponentErrorNotAuthorized					= 1,
-	MDDisqusComponentErrorWebViewAuthorizationFailed,
-	MDDisqusComponentErrorCancelled
-};
 
 @interface MDDisqusComponent : NSObject
 

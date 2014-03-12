@@ -54,6 +54,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		52598C1318D0E74100ABEB90 /* MDDisqusConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDDisqusConstants.h; sourceTree = "<group>"; };
 		52AB34A11869986C00F76FBD /* Disqus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Disqus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52AB34A41869986C00F76FBD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		52AB34A61869986C00F76FBD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -323,6 +324,7 @@
 			children = (
 				52DC9B471887F3F600272042 /* MDDisqusComponent.h */,
 				52DC9B481887F3F600272042 /* MDDisqusComponent.m */,
+				52598C1318D0E74100ABEB90 /* MDDisqusConstants.h */,
 			);
 			path = DisqusComponent;
 			sourceTree = "<group>";

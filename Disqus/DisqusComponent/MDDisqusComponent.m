@@ -71,7 +71,7 @@ NSString *const MDDisqusComponentAPIURL						= @"https://disqus.com/api/3.0/";
 
 // error domain
 NSString *const MDDisqusComponentErrorDomain				= @"MDDisqusComponentErrorDomain";
-
+NSString *const MDDisqusErrorDomain							= @"MDDisqusErrorDomain";
 // keys
 NSString *const MDDisqusComponentAuthorizationCompletionHandlerKey		= @"MDDisqusComponentAuthorizationCompletionHandlerKey";
 NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponentParentViewControllerKey";
@@ -255,6 +255,10 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
 	if (YES == requiresAuth) {
 		[paramsWithAPIKey setValue:self.accessToken forKey:@"access_token"];
 	}
+
+#ifdef DEBUG
+	NSLog(@"%@ params == %@", apiName, paramsWithAPIKey);
+#endif
 	
 	// construct URL
 	BOOL isGETRequest = [[httpMethod uppercaseString] isEqualToString:@"GET"];
@@ -284,10 +288,32 @@ NSString *const MDDisqusComponentParentViewControllerKey				= @"MDDisqusComponen
 		}
 		[responseHandler release];
 	} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+		// may be it is disqus error
+		NSError *parsingError = nil;
+		NSDictionary *jsonObject = [operation.responseSerializer responseObjectForResponse:operation.response data:operation.responseData error:&parsingError];
+		
+		// parsing error is not nil => we skip it
+		if ([jsonObject isKindOfClass:[NSDictionary class]] && [jsonObject objectForKey:@"code"]) {
+			// yeah, disqus error
+			NSDictionary *errorUserInfo = nil;
+			if (nil != jsonObject[@"response"]) {
+				errorUserInfo = [NSDictionary dictionaryWithObject:jsonObject[@"response"] forKey:NSLocalizedDescriptionKey];
+			}
+			NSInteger errorCode = [[jsonObject objectForKey:@"code"] intValue];
+			error = [NSError errorWithDomain:MDDisqusErrorDomain code:errorCode userInfo:errorUserInfo];
+		} else {
+			// setup an error
+			if (nil == error) {
+				if (nil != parsingError) {
+					error = parsingError;
+				} else {
+					error = [NSError errorWithDomain:MDDisqusComponentErrorDomain code:MDDisqusComponentErrorUnknown userInfo:nil];
+				}
+			}
+		}
+				
 		MDDisqusComponentAPIHandler responseHandler = [operation.userInfo objectForKey:@"handler"];
 		if (responseHandler) {
-			// TODO: put response JSON there
-			// AFNetworking does not parse JSON when request failed (stupid!)
 			responseHandler(nil, error);
 		}
 		[responseHandler release];
