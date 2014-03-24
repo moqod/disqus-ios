@@ -7,22 +7,23 @@ The project has been created by Moqod team to help many developers searching for
 Feel free to get in touch with us in regards to any questions or cooperation requests via email [info@moqod.com](mailto:info@moqod.com).
 
 # Update
+- [Mar 24, 2014] Added authorization via social networks: Facebook, Twitter and Google. ![Image](http://files.stage.mqd.me/disqus_list.png)
+- [Mar 24, 2014] Added access token refresing
 - Added ARC support to `MDDisqusComponent`.
 
 # Attention
 - Please, note the library uses git submodules, so make sure you clone the submodules to be able to use the library.
 
 # Features
-- Authorization via disqus.com.
+- Authorization via disqus.com and social networks.
 - API access.
 - Posting comments to discuss.
 - Answering comments in a thread.
-- And much more! Just learn the API and documentation.
+- And much more! Just learn the [API](http://disqus.com/api/docs/) and documentation.
 
 # Todo
-- Access token refresh.
-- Customizable authorization user interface. 
-- Authorization via supported social networks (Facebook, Twitter, Google+)
+- Customizable authorization user interface.
+- Sample app with more features.
 
 # 3rd Libraries
 This library uses [AFNetworking](https://github.com/AFNetworking/AFNetworking).
