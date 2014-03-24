@@ -177,7 +177,7 @@ typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
 	
 	// TODO: check domains list
-	NSArray *domains = [NSArray arrayWithObjects:@"disqus.com", @"facebook.com", @"twitter.com", /*@"google.com",*/ nil];
+	NSArray *domains = [NSArray arrayWithObjects:@"disqus.com", @"facebook.com", @"twitter.com", @"google.com", nil];
 	NSMutableArray *cookieToBeDeleted = [NSMutableArray array];
 	for (NSHTTPCookie *cookie in [cookieStorage cookies]) {
 		for (NSString *domain in domains) {
