@@ -9,10 +9,21 @@
 #import <Foundation/Foundation.h>
 #import "MDDisqusConstants.h"
 
+typedef NS_ENUM(NSInteger, MDDisqusComponentAuthorizationType) {
+    MDDisqusComponentAuthorizationDisqus = 0,
+    MDDisqusComponentAuthorizationFacebook,
+    MDDisqusComponentAuthorizationTwitter,
+    MDDisqusComponentAuthorizationGoogle,
+};
+
 typedef void(^MDDisqusComponentAPIHandler)(id response, NSError *error);
 typedef void(^MDDisqusComponentAuthorizationHandler)(NSError *error);
 
 @interface MDDisqusComponent : NSObject
+
+@property (nonatomic, readonly) NSString		*disqusPublicKey;
+@property (nonatomic, readonly) NSString		*disqusSecretKey;
+@property (nonatomic, readonly) NSURL			*disqusRedirectURL;
 
 @property (nonatomic, readonly) NSString		*accessToken;
 @property (nonatomic, readonly) BOOL			isAuthorized;
@@ -20,9 +31,13 @@ typedef void(^MDDisqusComponentAuthorizationHandler)(NSError *error);
 // initializer
 - (id)initWithPublicKey:(NSString *)publicKey secretKey:(NSString *)secretKey redirectURL:(NSURL *)redirectURL;
 
-// auth
+// authorize using MDDisqusComponentAuthorizationDisqus auth type
 - (void)authorizeModallyOnViewController:(UIViewController *)parentViewController completionHandler:(MDDisqusComponentAuthorizationHandler)completionHandler;
 
+// authorize using provided auth type
+- (void)authorizeVia:(MDDisqusComponentAuthorizationType)authorizationType modallyOnViewController:(UIViewController *)parentViewController completionHandler:(MDDisqusComponentAuthorizationHandler)completionHandler;
+
+// logs user out
 - (void)logout;
 
 // APIs

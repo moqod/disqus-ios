@@ -10,7 +10,9 @@
 #import "MDPostCellContentView.h"
 #import "MDNewPostViewController.h"
 
-@interface MDPostsViewController ()
+const int MDPostsViewControllerAuthorizationSheetViewTag			= 1;
+
+@interface MDPostsViewController () <UIActionSheetDelegate>
 
 @property (nonatomic, retain) NSString			*threadId;
 @property (nonatomic, retain) NSArray			*postsList;
@@ -59,20 +61,24 @@
 #pragma mark - actions
 
 - (void)addNewPostAction {
-	MDDisqusComponent *disqusComponent = GetAppDelegate().disqusComponent;
-
-	if (YES == disqusComponent.isAuthorized) {
+	if (YES == GetAppDelegate().disqusComponent.isAuthorized) {
 		MDNewPostViewController *newpostViewController = [[[MDNewPostViewController alloc] initWithThreadId:self.threadId] autorelease];
 		[self.navigationController pushViewController:newpostViewController animated:YES];
 	} else {
-		[disqusComponent authorizeModallyOnViewController:self completionHandler:^(NSError *error) {
-			if (nil == error) {
-				[self addNewPostAction];
-			} else {
-				[[[[UIAlertView alloc] initWithTitle:nil message:[error localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease] show];
-			}
-		}];
+		UIActionSheet *actionSheet = [[[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Disqus", @"Facebook", @"Twitter", @"Google", nil] autorelease];
+		actionSheet.tag = MDPostsViewControllerAuthorizationSheetViewTag;
+		[actionSheet showInView:self.view];
 	}
+}
+
+- (void)authorizeVia:(MDDisqusComponentAuthorizationType)authType {
+	[GetAppDelegate().disqusComponent authorizeVia:authType modallyOnViewController:self completionHandler:^(NSError *error) {
+		if (nil == error) {
+			[self addNewPostAction];
+		} else {
+			[[[[UIAlertView alloc] initWithTitle:nil message:[error localizedDescription] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] autorelease] show];
+		}
+	}];
 }
 
 #pragma mark - Table view data source
@@ -101,6 +107,16 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
 	NSDictionary *threadDictionary = [self.postsList objectAtIndex:indexPath.row];
 	return [MDPostCellContentView heightForPost:threadDictionary width:tableView.bounds.size.width];
+}
+
+#pragma mark - UIActionSheetDelegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex {
+	if (MDPostsViewControllerAuthorizationSheetViewTag == actionSheet.tag) {
+		if (buttonIndex != actionSheet.cancelButtonIndex) {
+			[self authorizeVia:buttonIndex];
+		}
+	}
 }
 
 #pragma mark -

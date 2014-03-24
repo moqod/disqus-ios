@@ -9,7 +9,7 @@
 #import "MDNewPostViewController.h"
 
 // tags
-const int MDNewPostViewControllerSuccessAlertViewTag			= 1;
+const int MDNewPostViewControllerSuccessAlertViewTag					= 1;
 
 @interface MDNewPostViewController () <UIAlertViewDelegate, UITextFieldDelegate> {
 	UITextField			*_textField;
@@ -39,13 +39,27 @@ const int MDNewPostViewControllerSuccessAlertViewTag			= 1;
 	[self.view addSubview:_textField];
 	[_textField becomeFirstResponder];
 	
+	const CGFloat buttonWidth = 160.0f;
+	const CGFloat buttonHeight = 35.0f;
+	UIButton *logoutButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+	logoutButton.frame = CGRectMake(floorf(self.view.bounds.size.width * 0.5f - buttonWidth * 0.5f), CGRectGetMaxY(_textField.frame) + 25.0f, buttonWidth, buttonHeight);
+	[logoutButton addTarget:self action:@selector(logoutAction) forControlEvents:UIControlEventTouchUpInside];
+	[logoutButton setTitle:@"Logout" forState:UIControlStateNormal];
+	[self.view addSubview:logoutButton];
+	
 	self.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(addNewPostAction)] autorelease];
 }
 
 #pragma mark - actions
 
+- (void)logoutAction {
+	[GetAppDelegate().disqusComponent logout];
+	[self.navigationController popViewControllerAnimated:YES];
+}
+
 - (void)addNewPostAction {
 	if (_textField.text.length > 0) {
+		[_textField resignFirstResponder];
 		NSMutableDictionary *params = [NSMutableDictionary dictionary];
 		[params setValue:_textField.text forKey:@"message"];
 		[params setValue:self.threadId forKey:@"thread"];
@@ -70,7 +84,7 @@ const int MDNewPostViewControllerSuccessAlertViewTag			= 1;
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
 	[self addNewPostAction];
-	return NO;
+	return YES;
 }
 
 #pragma mark -

@@ -28,4 +28,8 @@ typedef NS_ENUM(NSUInteger, MDDisqusComponentError) {
 	MDDisqusComponentErrorUnknown
 };
 
+// URIs
+extern NSString *const MDDisqusComponentAccessTokenURL;
+extern NSString *const MDDisqusComponentAuthorizeURL;
+
 #endif

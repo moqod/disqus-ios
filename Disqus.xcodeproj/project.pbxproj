@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5217F2CE18D5BD2200E7733D /* MDDisqusAuthorizationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5217F2C818D5BD2200E7733D /* MDDisqusAuthorizationView.m */; };
+		5217F2CF18D5BD2200E7733D /* MDDisqusAuthorizationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5217F2CA18D5BD2200E7733D /* MDDisqusAuthorizationViewController.m */; };
+		5217F2D018D5BD2200E7733D /* MDDisqusTokensModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5217F2CD18D5BD2200E7733D /* MDDisqusTokensModel.m */; };
+		5217F2D418D6115D00E7733D /* disqus_wheel.png in Resources */ = {isa = PBXBuildFile; fileRef = 5217F2D218D6115D00E7733D /* disqus_wheel.png */; };
+		5217F2D518D6115D00E7733D /* disqus_wheel@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5217F2D318D6115D00E7733D /* disqus_wheel@2x.png */; };
 		52AB34A51869986C00F76FBD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52AB34A41869986C00F76FBD /* Foundation.framework */; };
 		52AB34A71869986C00F76FBD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52AB34A61869986C00F76FBD /* CoreGraphics.framework */; };
 		52AB34A91869986C00F76FBD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52AB34A81869986C00F76FBD /* UIKit.framework */; };
@@ -54,7 +59,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		52598C1318D0E74100ABEB90 /* MDDisqusConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MDDisqusConstants.h; sourceTree = "<group>"; };
+		5217F2C718D5BD2200E7733D /* MDDisqusAuthorizationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDDisqusAuthorizationView.h; sourceTree = "<group>"; };
+		5217F2C818D5BD2200E7733D /* MDDisqusAuthorizationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDDisqusAuthorizationView.m; sourceTree = "<group>"; };
+		5217F2C918D5BD2200E7733D /* MDDisqusAuthorizationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDDisqusAuthorizationViewController.h; sourceTree = "<group>"; };
+		5217F2CA18D5BD2200E7733D /* MDDisqusAuthorizationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDDisqusAuthorizationViewController.m; sourceTree = "<group>"; };
+		5217F2CB18D5BD2200E7733D /* MDDisqusConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDDisqusConstants.h; sourceTree = "<group>"; };
+		5217F2CC18D5BD2200E7733D /* MDDisqusTokensModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDDisqusTokensModel.h; sourceTree = "<group>"; };
+		5217F2CD18D5BD2200E7733D /* MDDisqusTokensModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDDisqusTokensModel.m; sourceTree = "<group>"; };
+		5217F2D218D6115D00E7733D /* disqus_wheel.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = disqus_wheel.png; sourceTree = "<group>"; };
+		5217F2D318D6115D00E7733D /* disqus_wheel@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "disqus_wheel@2x.png"; sourceTree = "<group>"; };
 		52AB34A11869986C00F76FBD /* Disqus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Disqus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52AB34A41869986C00F76FBD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		52AB34A61869986C00F76FBD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -143,6 +156,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5217F2C618D5BD2200E7733D /* Internal */ = {
+			isa = PBXGroup;
+			children = (
+				5217F2C718D5BD2200E7733D /* MDDisqusAuthorizationView.h */,
+				5217F2C818D5BD2200E7733D /* MDDisqusAuthorizationView.m */,
+				5217F2C918D5BD2200E7733D /* MDDisqusAuthorizationViewController.h */,
+				5217F2CA18D5BD2200E7733D /* MDDisqusAuthorizationViewController.m */,
+				5217F2CB18D5BD2200E7733D /* MDDisqusConstants.h */,
+				5217F2CC18D5BD2200E7733D /* MDDisqusTokensModel.h */,
+				5217F2CD18D5BD2200E7733D /* MDDisqusTokensModel.m */,
+			);
+			path = Internal;
+			sourceTree = "<group>";
+		};
+		5217F2D118D6115D00E7733D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5217F2D218D6115D00E7733D /* disqus_wheel.png */,
+				5217F2D318D6115D00E7733D /* disqus_wheel@2x.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		52AB34981869986C00F76FBD = {
 			isa = PBXGroup;
 			children = (
@@ -322,9 +358,10 @@
 		52DC9B461887F3F600272042 /* DisqusComponent */ = {
 			isa = PBXGroup;
 			children = (
+				5217F2D118D6115D00E7733D /* Resources */,
+				5217F2C618D5BD2200E7733D /* Internal */,
 				52DC9B471887F3F600272042 /* MDDisqusComponent.h */,
 				52DC9B481887F3F600272042 /* MDDisqusComponent.m */,
-				52598C1318D0E74100ABEB90 /* MDDisqusConstants.h */,
 			);
 			path = DisqusComponent;
 			sourceTree = "<group>";
@@ -432,6 +469,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5217F2D418D6115D00E7733D /* disqus_wheel.png in Resources */,
+				5217F2D518D6115D00E7733D /* disqus_wheel@2x.png in Resources */,
 				52AB34AF1869986C00F76FBD /* InfoPlist.strings in Resources */,
 				52AB34B71869986C00F76FBD /* Images.xcassets in Resources */,
 			);
@@ -454,6 +493,7 @@
 			files = (
 				52DC9B5D18898A4800272042 /* MDNewPostViewController.m in Sources */,
 				52AB35A8186AE5B100F76FBD /* UIProgressView+AFNetworking.m in Sources */,
+				5217F2CF18D5BD2200E7733D /* MDDisqusAuthorizationViewController.m in Sources */,
 				52DC9B551889450C00272042 /* MDBaseViewController.m in Sources */,
 				52AB3563186AE5B100F76FBD /* AFHTTPRequestOperation.m in Sources */,
 				52AB35A6186AE5B100F76FBD /* UIButton+AFNetworking.m in Sources */,
@@ -473,7 +513,9 @@
 				52DC9B491887F3F600272042 /* MDDisqusComponent.m in Sources */,
 				52AB3569186AE5B100F76FBD /* AFURLRequestSerialization.m in Sources */,
 				52AB356B186AE5B100F76FBD /* AFURLSessionManager.m in Sources */,
+				5217F2CE18D5BD2200E7733D /* MDDisqusAuthorizationView.m in Sources */,
 				52AB34B11869986C00F76FBD /* main.m in Sources */,
+				5217F2D018D5BD2200E7733D /* MDDisqusTokensModel.m in Sources */,
 				52AB34B51869986C00F76FBD /* MDAppDelegate.m in Sources */,
 				52DC9B5918895B6D00272042 /* MDPostCellContentView.m in Sources */,
 			);

@@ -7,63 +7,9 @@
 //
 
 #import "MDDisqusComponent.h"
+#import "MDDisqusTokensModel.h"
+#import "MDDisqusAuthorizationViewController.h"
 #import "AFNetworking.h"
-
-// keys
-NS_INLINE NSString *MDDisqusTokensModelAccessTokenKeyForPublicKey(NSString *publicKey) {
-	return [NSString stringWithFormat:@"%@_%@", @"MDDisqusTokensModelAccessTokenKey", publicKey];
-}
-
-NS_INLINE NSString *MDDisqusTokensModelRefreshTokenKeyForPublicKey(NSString *publicKey) {
-	return [NSString stringWithFormat:@"%@_%@", @"MDDisqusTokensModelRefreshTokenKey", publicKey];
-}
-
-@interface MDDisqusTokensModel : NSObject
-
-@property (nonatomic, retain) NSString				*accessToken;
-@property (nonatomic, retain) NSString				*refreshToken;
-@property (nonatomic, retain) NSString				*publicKey;
-
-- (id)initWithPublicKey:(NSString *)publicKey;
-- (void)dump;
-- (void)reset;
-
-@end
-
-@implementation MDDisqusTokensModel
-
-- (id)initWithPublicKey:(NSString *)publicKey {
-	if (self = [super init]) {
-		self.publicKey = publicKey;
-		self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MDDisqusTokensModelAccessTokenKeyForPublicKey(self.publicKey)];
-		self.refreshToken = [[NSUserDefaults standardUserDefaults] objectForKey:MDDisqusTokensModelRefreshTokenKeyForPublicKey(self.publicKey)];
-	}
-	return self;
-}
-
-- (void)dealloc {
-#if !__has_feature(objc_arc)
-    [_accessToken release];
-	[_refreshToken release];
-	[_publicKey release];
-	[super dealloc];
-#endif
-}
-
-- (void)dump {
-	// TODO: store tokens in keychain
-	[[NSUserDefaults standardUserDefaults] setValue:self.accessToken forKey:MDDisqusTokensModelAccessTokenKeyForPublicKey(self.publicKey)];
-	[[NSUserDefaults standardUserDefaults] setValue:self.refreshToken forKey:MDDisqusTokensModelRefreshTokenKeyForPublicKey(self.publicKey)];
-	[[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (void)reset {
-	self.accessToken = nil;
-	self.refreshToken = nil;
-	[self dump];
-}
-
-@end
 
 // URLs
 NSString *const MDDisqusComponentBaseAuthURL				= @"https://disqus.com/api/oauth/2.0/";
@@ -84,7 +30,7 @@ NSString *const MDDisqusComponentInitialErrorKey						= @"MDDisqusComponentIniti
 typedef void (^AFHTTPRequestOperationSuccessCompletion)(AFHTTPRequestOperation *operation, id response);
 typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *operation, NSError *error);
 
-@interface MDDisqusComponent () <UIWebViewDelegate>
+@interface MDDisqusComponent () <MDDisqusAuthorizationViewControllerDelegate>
 
 @property (nonatomic, retain) MDDisqusTokensModel		*tokensModel;
 
@@ -106,6 +52,18 @@ typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *
 @implementation MDDisqusComponent
 
 #pragma mark - public
+
+- (NSString *)disqusPublicKey {
+	return self.publicKey;
+}
+
+- (NSString *)disqusSecretKey {
+	return self.secretKey;
+}
+
+- (NSURL *)disqusRedirectURL {
+	return self.redirectURL;
+}
 
 - (NSString *)accessToken {
 	return self.tokensModel.accessToken;
@@ -182,6 +140,7 @@ typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *
 - (void)dealloc {
 	self.operationFailureCompletion = nil;
 	self.operationSuccessCompletion = nil;
+	self.parentViewController = nil;
 #if !__has_feature(objc_arc)
 	[_publicKey release];
 	[_secretKey release];
@@ -195,45 +154,46 @@ typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *
 #pragma mark -
 
 - (void)authorizeModallyOnViewController:(UIViewController *)parentViewController completionHandler:(MDDisqusComponentAuthorizationHandler)completionHandler {
+	[self authorizeVia:MDDisqusComponentAuthorizationDisqus modallyOnViewController:parentViewController completionHandler:completionHandler];
+}
+
+- (void)authorizeVia:(MDDisqusComponentAuthorizationType)authorizationType modallyOnViewController:(UIViewController *)parentViewController completionHandler:(MDDisqusComponentAuthorizationHandler)completionHandler {
 	self.authorizationCompletionHandler = completionHandler;
 	self.parentViewController = parentViewController;
 	
-    NSString *params = [NSString stringWithFormat:@"client_id=%@&scope=read,write&response_type=code&redirect_uri=%@", self.publicKey, self.redirectURL.absoluteString];
-	NSURL *authorizeURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@?%@", MDDisqusComponentAuthorizeURL, params]];
-	
-	UIViewController *viewController = [[UIViewController alloc] init];
+	MDDisqusAuthorizationViewController *viewController = [[MDDisqusAuthorizationViewController alloc] initWithAuthorizationType:authorizationType disqusComponent:self];
+	viewController.delegate = self;
 #if !__has_feature(objc_arc)
     [viewController autorelease];
 #endif
-	viewController.title = @"Disqus";
-	UIWebView *webView = [[UIWebView alloc] initWithFrame:CGRectZero];
-#if !__has_feature(objc_arc)
-    [webView autorelease];
-#endif
-	webView.delegate = self;
-	viewController.view = webView;
-	
 	UINavigationController *fakeNavigationController = [[UINavigationController alloc] initWithRootViewController:viewController];
 #if !__has_feature(objc_arc)
     [fakeNavigationController autorelease];
 #endif
-	[webView loadRequest:[NSURLRequest requestWithURL:authorizeURL]];
-    
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAuthorizationAction)];
-#if !__has_feature(objc_arc)
-    [barButtonItem autorelease];
-#endif
-	viewController.navigationItem.rightBarButtonItem = barButtonItem;
 	[parentViewController presentViewController:fakeNavigationController animated:YES completion:nil];
 }
 
 - (void)logout {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+	
+	// TODO: check domains list
+	NSArray *domains = [NSArray arrayWithObjects:@"disqus.com", @"facebook.com", @"twitter.com", /*@"google.com",*/ nil];
+	NSMutableArray *cookieToBeDeleted = [NSMutableArray array];
+	for (NSHTTPCookie *cookie in [cookieStorage cookies]) {
+		for (NSString *domain in domains) {
+			if ([cookie.domain rangeOfString:domain].location != NSNotFound) {
+				[cookieToBeDeleted addObject:cookie];
+			}
+		}
+	}
+	
+	/*
     NSArray *cookies = [[cookieStorage cookiesForURL:[NSURL URLWithString:MDDisqusComponentBaseAuthURL]] copy];
 #if !__has_feature(objc_arc)
     [cookies  autorelease];
 #endif
-    for (NSHTTPCookie *cookie in cookies) {
+	 */
+    for (NSHTTPCookie *cookie in cookieToBeDeleted) {
         [cookieStorage deleteCookie:cookie];
     }
 	[self.tokensModel reset];
@@ -241,26 +201,20 @@ typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *
 
 #pragma mark - UIWebViewDelegate
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-	if (YES == [request.URL.host isEqualToString:self.redirectURL.host]) {
-		NSDictionary *params = [self paramsFromQueryString:request.URL.query];
-		if ([params objectForKey:@"code"]) {
-			[self requestAccessToken:[params objectForKey:@"code"]];
-		} else {
-			// TODO: parse disqus response error (error parameter name)
-			NSError *error = [NSError errorWithDomain:MDDisqusComponentErrorDomain code:MDDisqusComponentErrorWebViewAuthorizationFailed userInfo:nil];
-			[self performAuthorizationCompletionHandlerWithError:error];
-		}
-		return NO;
-	} else {
-		return YES;
-	}
-	return YES;
-}
-
-- (void)cancelAuthorizationAction {
+- (void)disqusAuthorizationViewControllerDidCancel:(MDDisqusAuthorizationViewController *)authorizationViewController {
 	NSError *error = [NSError errorWithDomain:MDDisqusComponentErrorDomain code:MDDisqusComponentErrorCancelled userInfo:nil];
 	[self performAuthorizationCompletionHandlerWithError:error];
+}
+
+- (void)disqusAuthorizationViewControllerDidFinish:(MDDisqusAuthorizationViewController *)authorizationViewController accessToken:(NSString *)accessToken refreshToken:(NSString *)refreshToken error:(NSError *)error {
+	if (nil != error) {
+		[self performAuthorizationCompletionHandlerWithError:error];
+	} else {
+		self.tokensModel.accessToken = accessToken;
+		self.tokensModel.refreshToken = refreshToken;
+		[self.tokensModel dump];
+		[self performAuthorizationCompletionHandlerWithError:nil];
+	}
 }
 
 #pragma mark - Access Token
@@ -275,32 +229,6 @@ typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *
 	
 	self.authorizationCompletionHandler = nil;
 	self.parentViewController = nil;
-}
-
-- (void)requestAccessToken:(NSString *)requestToken {
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:MDDisqusComponentAccessTokenURL] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:60.0];
-	NSString *paramsString = [NSString stringWithFormat:@"client_id=%@&client_secret=%@&grant_type=%@&redirect_uri=%@&code=%@", self.publicKey, self.secretKey, @"authorization_code", self.redirectURL, requestToken];
-	request.HTTPBody = [paramsString dataUsingEncoding:NSUTF8StringEncoding];
-	request.HTTPMethod = @"POST";
-	AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
-#if !__has_feature(objc_arc)
-    [operation autorelease];
-#endif
-	operation.responseSerializer = [AFJSONResponseSerializer serializer];
-	[operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, NSDictionary *response) {
-		if ([response isKindOfClass:[NSDictionary class]] && [response objectForKey:@"access_token"] && [response objectForKey:@"refresh_token"]) {
-			self.tokensModel.accessToken = [response objectForKey:@"access_token"];
-			self.tokensModel.refreshToken = [response objectForKey:@"refresh_token"];
-			[self.tokensModel dump];
-			[self performAuthorizationCompletionHandlerWithError:nil];
-		} else {
-			NSError *error = [NSError errorWithDomain:MDDisqusComponentErrorDomain code:MDDisqusComponentErrorWebViewAuthorizationFailed userInfo:nil];
-			[self performAuthorizationCompletionHandlerWithError:error];
-		}
-	} failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-		[self performAuthorizationCompletionHandlerWithError:error];
-	}];
-	[operation start];
 }
 
 #pragma mark - Renewing Access Token stuff
