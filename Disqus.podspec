@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "Disqus"
-  spec.version      = "0.0.2"
+  spec.version      = “0.0.4”
   spec.summary      = "iOS Disqus API"
   spec.description  = "The project has been created by Moqod team to help many developers searching for this solution on Stackoverflow and else where. Special thanks to Disqus for answering support questions promptly! When integrating this solution to your project, please, spare us a like on Facebook, follow us on Twitter or spread a good word about us!"
   spec.homepage     = "https://disqus.com/"
