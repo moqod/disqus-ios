@@ -359,26 +359,27 @@ typedef void (^AFHTTPRequestOperationFailureCompletion)(AFHTTPRequestOperation *
 	}
 	
 	if (!self.operationFailureCompletion) {
+		__block MDDisqusComponent *selfPointer = self;
 		self.operationFailureCompletion = ^(AFHTTPRequestOperation *operation, NSError *error) {
 			BOOL shouldNotifyDelegate = YES;
 			// may be it is disqus error
-			NSError *disqusError = [self disqusErrorFromFailedOperation:operation];
+			NSError *disqusError = [selfPointer disqusErrorFromFailedOperation:operation];
 			if (nil != disqusError) {
 				// yeah, disqus error
 				error = disqusError;
 				
-				if ([self isInvalidAccessTokenError:error]) {
+				if ([selfPointer isInvalidAccessTokenError:error]) {
 					AFHTTPRequestOperation *dupOperation = [[AFHTTPRequestOperation alloc] initWithRequest:operation.request];
 					NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:operation.userInfo];
 					[userInfo setValue:error forKey:MDDisqusComponentInitialErrorKey];
 					dupOperation.userInfo = userInfo;
 					dupOperation.responseSerializer = [AFJSONResponseSerializer serializer];
-					[dupOperation setCompletionBlockWithSuccess:self.operationSuccessCompletion failure:self.operationFailureCompletion];
+					[dupOperation setCompletionBlockWithSuccess:selfPointer.operationSuccessCompletion failure:selfPointer.operationFailureCompletion];
 #if !__has_feature(objc_arc)
 					[dupOperation autorelease];
 #endif
-					[self postponeFailedOperation:dupOperation];
-					[self renewAccessToken];
+					[selfPointer postponeFailedOperation:dupOperation];
+					[selfPointer renewAccessToken];
 					shouldNotifyDelegate = NO;
 				}
 			}
